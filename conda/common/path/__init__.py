@@ -158,7 +158,9 @@ def ensure_pad(name, pad="_"):
 
 
 def right_pad_os_sep(path):
-    return path if path.endswith(os.sep) else path + os.sep
+    sep = os.sep
+    # Hoist os.sep to local variable to avoid attribute lookup on each call
+    return path if path.endswith(sep) else path + sep
 
 
 def split_filename(path_or_url):
