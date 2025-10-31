@@ -151,10 +151,11 @@ def ensure_pad(name, pad="_"):
         ''
 
     """
-    if not name or name[0] == name[-1] == pad:
+    if not name:
         return name
-    else:
-        return f"{pad}{name}{pad}"
+    if name[0] == pad and name[-1] == pad:
+        return name
+    return f"{pad}{name}{pad}"
 
 
 def right_pad_os_sep(path):
