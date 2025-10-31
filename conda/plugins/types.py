@@ -355,7 +355,7 @@ class ReporterRendererBase(ABC):
     """
 
     def render(self, data: Any, **kwargs) -> str:
-        return str(data)
+        return f"{data}"
 
     @abstractmethod
     def detail_view(self, data: dict[str, str | int | bool], **kwargs) -> str:
