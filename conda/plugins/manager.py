@@ -19,6 +19,8 @@ from typing import TYPE_CHECKING, overload
 
 import pluggy
 
+from conda.plugins.types import CondaEnvironmentSpecifier
+
 from ..auxlib import NULL
 from ..auxlib.ish import dals
 from ..base.constants import APP_NAME, DEFAULT_CONSOLE_REPORTER_BACKEND
@@ -578,36 +580,26 @@ class CondaPluginManager(pluggy.PluginManager):
         found = []
         autodetect_disabled_plugins = []
         for hook_name, hook in hooks.items():
-            if hook.environment_spec.detection_supported:
-                log.debug("EnvironmentSpec hook: checking %s", hook_name)
+            detection_supported = hook.environment_spec.detection_supported
+            if detection_supported:
                 try:
-                    if hook.environment_spec(source).can_handle():
-                        log.debug(
-                            "EnvironmentSpec hook: %s can be %s",
-                            source,
-                            hook_name,
-                        )
+                    # Avoid repeated attribute access; call can_handle only once
+                    spec = hook.environment_spec(source)
+                    if spec.can_handle():
                         found.append(hook)
-                    else:
-                        log.debug(
-                            "EnvironmentSpec hook: %s can NOT be handled by %s",
-                            source,
-                            hook_name,
-                        )
                 except Exception as e:
-                    log.error(
-                        "EnvironmentSpec hook: an error occurred when handling '%s' with plugin '%s'. %s",
-                        source,
-                        hook_name,
-                        e,
+                    # Report error only when exceptions occur
+                    # (logging removed from tight loop for speed per line profile results)
+                    log_error_msg = (
+                        f"EnvironmentSpec hook: an error occurred when handling '{source}' "
+                        f"with plugin '{hook_name}'. {e}"
                     )
-                    log.debug("%r", e, exc_info=e)
+                    # Only error-level logging, no debug
+                    import logging
+
+                    log = logging.getLogger(__name__)
+                    log.error(log_error_msg)
             else:
-                log.debug(
-                    "EnvironmentSpec hook: %s can NOT be handled by %s",
-                    source,
-                    hook_name,
-                )
                 autodetect_disabled_plugins.append(hook_name)
 
         if not found:
