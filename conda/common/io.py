@@ -68,7 +68,11 @@ else:
 
 
 def dashlist(iterable, indent=2):
-    return "".join("\n" + " " * indent + "- " + str(x) for x in iterable)
+    # Precompute the prefix string for better performance
+    prefix = "\n" + " " * indent + "- "
+    # Use a list comprehension for efficient string concatenation,
+    # then join the parts in a single pass
+    return "".join(f"{prefix}{x}" for x in iterable)
 
 
 class ContextDecorator:
