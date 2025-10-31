@@ -12,9 +12,13 @@ from ..common.constants import NULL
 class NullCountAction(_CountAction):
     @staticmethod
     def _ensure_value(namespace, name, value):
-        if getattr(namespace, name, NULL) in (NULL, None):
-            setattr(namespace, name, value)
-        return getattr(namespace, name)
+        # Fast path: use __dict__ direct access to avoid slow getattr unless necessary
+        nsdict = namespace.__dict__
+        v = nsdict.get(name, NULL)
+        if v is NULL or v is None:
+            nsdict[name] = value
+            return value
+        return v
 
     def __call__(self, parser, namespace, values, option_string=None):
         new_count = self._ensure_value(namespace, self.dest, 0) + 1
