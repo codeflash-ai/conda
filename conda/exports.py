@@ -171,10 +171,10 @@ def linked_data(prefix, ignore_channels=False):
     from .models.dist import Dist
 
     pd = PrefixData(prefix)
-    return {
-        Dist(prefix_record): prefix_record
-        for prefix_record in pd._prefix_records.values()
-    }
+    prefix_records_values = pd._prefix_records.values()
+    # Use dict comprehension, as in original, but apply small performance tweaks
+    # Using local variable for .values() for potential small speedup
+    return {Dist(record): record for record in prefix_records_values}
 
 
 def linked(prefix, ignore_channels=False):
