@@ -501,11 +501,14 @@ class time_recorder(ContextDecorator):  # pragma: no cover
         if not (enabled and boolify(enabled)):
             return
         log.info("=== time_recorder total time and calls ===")
-        for entry_name in sorted(cls.total_run_time.keys()):
+        total_run_time = cls.total_run_time
+        total_call_num = cls.total_call_num
+        entry_names = sorted(total_run_time.keys())
+        for entry_name in entry_names:
             log.info(
                 "TOTAL %9.3f % 9d %s",
-                cls.total_run_time[entry_name],
-                cls.total_call_num[entry_name],
+                total_run_time[entry_name],
+                total_call_num[entry_name],
                 entry_name,
             )
 
