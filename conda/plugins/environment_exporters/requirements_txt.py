@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from conda.models.environment import Environment
+
 from ... import __version__
 from ...exceptions import CondaValueError
 from ..hookspec import hookimpl
@@ -27,11 +29,6 @@ REQUIREMENTS_FORMAT: Final = "requirements"
 
 def export_requirements(env: Environment) -> str:
     """Export Environment to requirements format with MatchSpecs (CEP 23 compliant)."""
-    lines = ["# This file may be used to create an environment using:"]
-    lines.append("# $ conda create --name <env> --file <this file>")
-    lines.append(f"# platform: {env.platform}")
-    lines.append(f"# created-by: conda {__version__}")
-
     # Only create requirements files if we have requested packages
     if not env.requested_packages:
         raise CondaValueError(
@@ -40,15 +37,17 @@ def export_requirements(env: Environment) -> str:
             "or ensure the environment has package specifications."
         )
 
-    # Create CEP 23 compliant non-explicit requirements file (no @EXPLICIT)
-    lines.append("# Note: This is a conda requirements file (MatchSpec format)")
-    lines.append("# Contains conda package specifications, not pip requirements")
-    lines.append("")
-
-    for spec in env.requested_packages:
-        # Use MatchSpec string representation (CEP 23 compliant)
-        lines.append(str(spec))
-
+    lines = [
+        "# This file may be used to create an environment using:",
+        "# $ conda create --name <env> --file <this file>",
+        f"# platform: {env.platform}",
+        f"# created-by: conda {__version__}",
+        "# Note: This is a conda requirements file (MatchSpec format)",
+        "# Contains conda package specifications, not pip requirements",
+        ""
+    ]
+    
+    lines.extend(map(str, env.requested_packages))
     return "\n".join(lines)
 
 
