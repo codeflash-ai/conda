@@ -74,6 +74,8 @@ from .prefix_data import PrefixData
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
+_HISTORY_SHORT_PATH = join("conda-meta", "history")
+
 try:
     FileNotFoundError
 except NameError:
@@ -1028,12 +1030,11 @@ class UpdateHistoryAction(CreateInPrefixPathAction):
         update_specs,
         neutered_specs,
     ):
-        target_short_path = join("conda-meta", "history")
         return (
             cls(
                 transaction_context,
                 target_prefix,
-                target_short_path,
+                _HISTORY_SHORT_PATH,
                 remove_specs,
                 update_specs,
                 neutered_specs,
