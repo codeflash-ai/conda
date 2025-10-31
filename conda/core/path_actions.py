@@ -1179,10 +1179,14 @@ class UnlinkPathAction(RemoveFromPrefixPathAction):
 class RemoveMenuAction(RemoveFromPrefixPathAction):
     @classmethod
     def create_actions(cls, transaction_context, linked_package_data, target_prefix):
+        # Pre-bind _MENU_RE.match for faster attribute access inside loop
+        match = _MENU_RE.match
+        files = linked_package_data.files
+        # Use generator expression for memory efficiency, then tuple
         return tuple(
             cls(transaction_context, linked_package_data, target_prefix, trgt)
-            for trgt in linked_package_data.files
-            if bool(_MENU_RE.match(trgt))
+            for trgt in files
+            if match(trgt)
         )
 
     def __init__(
