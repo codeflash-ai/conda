@@ -162,8 +162,13 @@ def right_pad_os_sep(path):
 
 
 def split_filename(path_or_url):
-    dn, fn = split(path_or_url)
-    return (dn or None, fn) if "." in fn else (path_or_url, None)
+    last_slash = path_or_url.rfind('/')
+    fn = path_or_url[last_slash + 1:] if last_slash != -1 else path_or_url
+    if "." in fn:
+        dn, fn = split(path_or_url)
+        return (dn or None, fn)
+    else:
+        return (path_or_url, None)
 
 
 def strip_pkg_extension(path: str):
